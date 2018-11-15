@@ -32,6 +32,7 @@ bool checkBissextile (int yearNum)
 
 void displayMonth (int month, int& monthStartDay, bool isBissextile, int mondayIndex)
 {
+    //Month Header
     cout<<MONTHS[month]<<endl;
     for(int i=1; i<=7; ++i)
     {
@@ -39,6 +40,7 @@ void displayMonth (int month, int& monthStartDay, bool isBissextile, int mondayI
     }
     cout<<endl;
     
+    //Initial Operations
     int numDays = (month%2)+30;
     monthStartDay = (monthStartDay + numDays)%7;
     
@@ -51,10 +53,13 @@ void displayMonth (int month, int& monthStartDay, bool isBissextile, int mondayI
         }
     }
     
+    //Display
+    
 }
 
 void displayYear (int yearNum, int mondayIndex)
 {
+    //Initial Operations
     bool isBissextile = checkBissextile (yearNum);
     int monthStartDay = yearStartDay(yearNum);
     
@@ -62,6 +67,9 @@ void displayYear (int yearNum, int mondayIndex)
     {
         displayMonth (i, monthStartDay, isBissextile, mondayIndex);
     }
+    
+    //Display
+    
     
 }
 
