@@ -18,33 +18,6 @@ using namespace std;
 const char WEEKDAYS[7] = {'L', 'M', 'M', 'J', 'V', 'S', 'D'};
 const string MONTHS[12] = {"Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"};
 
-void displayMonth (int month, int offset, bool isBissextile, int mondayIndex)
-{
-    cout<<MONTHS[month-1]<<endl;
-    for(int i=1; i<=7; ++i)
-    {
-        cout<<"  "<<WEEKDAYS[(i-mondayIndex+7)%7];
-    }
-    cout<<endl;
-    
-    int numDays = (month%2)+30;
-    
-    if (month==2)
-    {
-        numDays -= 2;
-        if (isBissextile)
-        {
-            numDays+=1;
-        }
-    }
-    
-}
-
-void displayYear (int yearNum)
-{
-    
-}
-
 bool checkBissextile (int yearNum)
 {
     if (yearNum % 100)
@@ -57,16 +30,43 @@ bool checkBissextile (int yearNum)
     }
 }
 
+void displayMonth (int month, int& monthStartDay, bool isBissextile, int mondayIndex)
+{
+    cout<<MONTHS[month]<<endl;
+    for(int i=1; i<=7; ++i)
+    {
+        cout<<"  "<<WEEKDAYS[(i-mondayIndex+7)%7];
+    }
+    cout<<endl;
+    
+    int numDays = (month%2)+30;
+    monthStartDay = (monthStartDay + numDays)%7;
+    
+    if (month==2)
+    {
+        numDays -= 2;
+        if (isBissextile)
+        {
+            numDays+=1;
+        }
+    }
+    
+}
 
-
-
-
-
+void displayYear (int yearNum, int mondayIndex)
+{
+    bool isBissextile = checkBissextile (yearNum);
+    int monthStartDay = yearStartDay(yearNum);
+    
+    for (int i = 0; i<12; ++i)
+    {
+        displayMonth (i, monthStartDay, isBissextile, mondayIndex);
+    }
+    
+}
 
 
 int main()
 {
-    displayMonth(1, 0, 0, 5);
-    
     return 0;
 }
