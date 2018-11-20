@@ -12,6 +12,7 @@
  --------------------------- */
 #include <iostream>
 #include <string>
+#include <iomanip>
 using namespace std;
 
 
@@ -30,20 +31,23 @@ bool checkBissextile (int yearNum)
     }
 }
 
-void displayMonth (int month, int& monthStartDay, bool isBissextile, int mondayIndex)
+int yearStartIndex(int year)
+{
+    return (1 + 2*13 + (3*(13+1)/5) + (year-1) + ((year-1) /4) - ((year-1) /100) + ((year-1) /400))%7;
+}
+
+void displayMonth (int month, int& monthStartIndex, bool isBissextile, int mondayIndex)
 {
     //Month Header
-    cout<<MONTHS[month]<<endl;
-    for(int i=1; i<=7; ++i)
+    cout<<MONTHS[month-1]<<endl;
+    for(int i=0; i<7; ++i)
     {
         cout<<"  "<<WEEKDAYS[(i-mondayIndex+7)%7];
     }
     cout<<endl;
     
     //Initial Operations
-    int numDays = (month%2)+30;
-    monthStartDay = (monthStartDay + numDays)%7;
-    
+    int numDays = ((month+1)%2)+30;
     if (month==2)
     {
         numDays -= 2;
@@ -55,17 +59,43 @@ void displayMonth (int month, int& monthStartDay, bool isBissextile, int mondayI
     
     //Display
     
+    //Jours vides
+    for(int i=0; i<(monthStartIndex+mondayIndex)%7;++i)
+    {
+        cout<<"   ";
+    }
+    //Jours pleins
+    for (int i=1; i<= numDays; ++i)
+    {
+        cout<<" ";
+        
+        if(i< 10)
+        {
+            cout<<" ";//Espace en plus lorsqu'on est sur 1 digit seulement
+        }
+        cout<<i;//Jour courant
+        
+        if(not((i+mondayIndex+monthStartIndex)%7))
+        {
+            cout<<endl;
+        }
+        
+    }
+    
+    
+        
+    monthStartIndex = (monthStartIndex + numDays)%7;
 }
 
 void displayYear (int yearNum, int mondayIndex)
 {
     //Initial Operations
     bool isBissextile = checkBissextile (yearNum);
-    int monthStartDay = yearStartDay(yearNum);
+    int monthStartIndex = yearStartIndex(yearNum);
     
-    for (int i = 0; i<12; ++i)
+    for (int i = 1; i<=12; ++i)
     {
-        displayMonth (i, monthStartDay, isBissextile, mondayIndex);
+        displayMonth (i, monthStartIndex, isBissextile, mondayIndex);
     }
     
     //Display
@@ -76,5 +106,6 @@ void displayYear (int yearNum, int mondayIndex)
 
 int main()
 {
+    displayYear (2018, 3);
     return 0;
 }
