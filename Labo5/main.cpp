@@ -13,24 +13,24 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <limits>
 using namespace std;
 
 
 const char WEEKDAYS[7] = {'L', 'M', 'M', 'J', 'V', 'S', 'D'};
 const string MONTHS[12] = {"Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"};
-const char SPACE = '.';
-const int NUMBER_OF_YEAR_DIGITS = 4;
+const char SPACE = ' ';
 const int DISPLAY_WIDTH = 21;
 
 bool checkBissextile (int yearNum)
 {
     if (yearNum % 100)
     {
-        return !(yearNum % 400);
+        return !(yearNum % 4);
     }
     else
     {
-        return !(yearNum % 4);
+        return !(yearNum % 400);        
     }
 }
 
@@ -70,9 +70,14 @@ int getDaysInMonth(int month, bool isBissextile)
 
 void displayCenteredText(string input, int lineLength = DISPLAY_WIDTH)
 {
-    cout << setw(((lineLength + (int)input.length() + 1) / 2))
+    cout << setw(((lineLength + (int)input.length()) / 2))
     << right << input
-    << setw((lineLength - (int)input.length())/2 + 1) <<'\n';
+    << setw((lineLength - (int)input.length()+1)/2 + 1) <<'\n';
+}
+
+void displayEmptyLine(int lineLength = DISPLAY_WIDTH)
+{
+    cout << setw(lineLength +1) << '\n';
 }
 
 
@@ -107,6 +112,7 @@ int displayMonth (int month, int monthStartIndex, bool isBissextile, int mondayI
 ;
     }
     //Jours pleins
+    bool EndOfLine = true;
     for (int i=1; i<= numDays; ++i)
     {
         
@@ -115,11 +121,20 @@ int displayMonth (int month, int monthStartIndex, bool isBissextile, int mondayI
         if(not((i+mondayIndex+monthStartIndex)%7))
         {
             cout<<endl;
+            EndOfLine = true;
+        }
+        else
+        {
+            EndOfLine = false;
         }
         
     }
-    cout << setw(DISPLAY_WIDTH - ((numDays+monthStartIndex+mondayIndex)%7)*3 + 1);
-    cout << '\n';
+    if(not(EndOfLine))
+    {
+        cout << setw(DISPLAY_WIDTH - ((numDays+monthStartIndex+mondayIndex)%7)*3 + 1);//Fin de dernière ligne
+        cout << '\n';
+    }
+    
         
     return monthStartIndex = (monthStartIndex + numDays)%7;
 }
@@ -130,20 +145,45 @@ void displayYear (int yearNum, int mondayIndex)
     bool isBissextile = checkBissextile (yearNum);
     int monthStartIndex = yearStartIndex(yearNum);
     
+    //Display
+    displayCenteredText(to_string(yearNum));
+    displayEmptyLine();
     for (int i = 1; i<=12; ++i)
     {
         monthStartIndex = displayMonth (i, monthStartIndex, isBissextile, mondayIndex);
+        displayEmptyLine();
     }
     
-    //Display
+    
     
     
 }
 
 
-int main()
-{
+unsigned int entreeCorrecte(string AskingMessage, string ErrorMessage, unsigned int borneMin, unsigned int borneMax) {
+    unsigned int yearToDisplay;
+    do {
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        cout << AskingMessage << ' ';
+        cin >> yearToDisplay;
+        
+        if (yearToDisplay < borneMin || yearToDisplay > borneMax || cin.fail()) {
+            cout << ErrorMessage << endl;
+        }
+        
+    } while (yearToDisplay < borneMin || yearToDisplay > borneMax || cin.fail());
+    return yearToDisplay;
+}
+
+int main() {
     cout << setfill(SPACE);
-    displayYear (2018, 0);
+    unsigned int yearToDisplay = entreeCorrecte("Quelle annee voulez-vous afficher? (1600-3000)", "Entree non valide", 1600, 3000);
+    
+    unsigned int dayToDisplay = entreeCorrecte("Quel jour de la semaine est le lundi? (1-7)", "Entree non valide", 1, 7);
+    cout<<endl;
+    displayYear(yearToDisplay, dayToDisplay-1);
     return 0;
 }
