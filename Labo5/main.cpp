@@ -1,7 +1,7 @@
 /* ---------------------------
  Laboratoire : 4
  Fichier :     main.cpp
- Auteur(s) :   Emmanuel Janssens, Robin Reuteler, Benoit Perret
+ Auteur(s) :   Emmanuel Janssens, Robin Reuteler,v Benoit Perret
  Date :        14.11.2018
  
  But :
@@ -11,10 +11,8 @@
  Compilateur : GNU GCC Compiler
  --------------------------- */
 #include <iostream>
-#include <iomanip>
 #include <string>
-#include <limits>
-
+#include <iomanip>
 using namespace std;
 
 
@@ -22,82 +20,130 @@ const char WEEKDAYS[7] = {'L', 'M', 'M', 'J', 'V', 'S', 'D'};
 const string MONTHS[12] = {"Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"};
 const char SPACE = '.';
 const int NUMBER_OF_YEAR_DIGITS = 4;
-const int DISPLAY_WIDTH = 20;
-const int DEMI_DISPLAY_WIDTH = DISPLAY_WIDTH / 2;
+const int DISPLAY_WIDTH = 21;
 
-bool checkBissextile(int yearNum) {
-   if (yearNum % 100) {
-      return !(yearNum % 400);
-   } else {
-      return !(yearNum % 4);
-   }
+bool checkBissextile (int yearNum)
+{
+    if (yearNum % 100)
+    {
+        return !(yearNum % 400);
+    }
+    else
+    {
+        return !(yearNum % 4);
+    }
 }
 
-void displayMonth(int month, int monthStartDay, bool isBissextile, int mondayIndex) {
-   /* Si le nombre de lettre du mois est impair on le transforme en nombre pair afin
-    *  de faciliter les divisions sur les entiers pour obtenir un alignement exact. */
-   const int NbLetterMonth = (MONTHS[month - 1].length()) % 2 != 0 ? MONTHS[month - 1].length() + 1 : MONTHS[month - 1].length();
-   cout << SPACE << setw(((DISPLAY_WIDTH - NbLetterMonth) / 2) + NbLetterMonth) <<
-   setfill(SPACE) << right << MONTHS[month - 1] <<
-   setw(((DISPLAY_WIDTH - NbLetterMonth) / 2))
-   << setfill(SPACE) << SPACE << endl;
-   for (int i = 1; i <= 7; ++i) {
-      cout << "  " << WEEKDAYS[(i - mondayIndex + 7) % 7];
-   }
-   cout << endl;
-
-   //Initial Operations
-   int numDays = (month % 2) + 30;
-   monthStartDay = (monthStartDay + numDays) % 7;
-
-   if (month == 2) {
-      numDays -= 2;
-      if (isBissextile) {
-         numDays += 1;
-      }
-   }
-
-   //Display
-
+int yearStartIndex(int year)
+{
+    return (1 + 2*13 + (3*(13+1)/5) + (year-1) + ((year-1) /4) - ((year-1) /100) + ((year-1) /400))%7;
 }
 
-void displayYear(int yearNum, int mondayIndex) {
-   //Initial Operations
-   bool isBissextile = checkBissextile(yearNum);
-   // int monthStartDay = yearStartDay(yearNum);
-
-   for (int i = 0; i < 12; ++i) {
-      // displayMonth(i, monthStartDay, isBissextile, mondayIndex);
-   }
-
-   //Display
-
-
+int getDaysInMonth(int month, bool isBissextile)
+{
+    int numDays = 0;
+    
+    
+    switch(month)
+    {
+        case 2:
+            numDays = 28;
+            if(isBissextile)
+            {
+                numDays+=1;
+            }
+            break;
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+            numDays = ((month+1)%2)+30;
+            break;
+        default:
+            numDays = ((month)%2)+30;
+            break;
+    }
+    
+    return numDays;
 }
 
-int main() {
-   unsigned int yearToDisplay;
-   unsigned int dayToDisplay;
-   const int NB_DIGITS_YEAR = 4;
-   do {
-      if (cin.fail()) {
-         cin.clear();
-         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-      }
-      cout << "Quelle annee voulez-vous afficher? (1600-3000)" << endl;
-      cin >> yearToDisplay;
-   } while (yearToDisplay < 1600 || yearToDisplay > 3000);
-   do {
-      if (cin.fail()) {
-         cin.clear();
-         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-      }
-      cout << "Quel jour de la semaine est le lundi? (1-7)" << endl;
-      cin >> dayToDisplay;
+void displayCenteredText(string input, int lineLength = DISPLAY_WIDTH)
+{
+    cout << setw(((lineLength + (int)input.length() + 1) / 2))
+    << right << input
+    << setw((lineLength - (int)input.length())/2 + 1) <<'\n';
+}
 
-   } while (cin.fail() || (dayToDisplay < 1 || dayToDisplay > 7));
-   cout << SPACE << setw(((DISPLAY_WIDTH - NUMBER_OF_YEAR_DIGITS) / 2) + NUMBER_OF_YEAR_DIGITS) << setfill(SPACE) << right << yearToDisplay << setw(((DISPLAY_WIDTH - NUMBER_OF_YEAR_DIGITS) / 2)) << setfill(SPACE) << SPACE << endl;
-   displayMonth(3, 0, 0, 5);
 
-   return 0;
+/*
+ @brief
+ 
+ @param int month
+ @param int monthStartIndex entier de 0 à 6
+ @param bool isBissextile indique si l'année est bissextile
+ @param int mondayIndex entier de 1 à 7
+*/
+int displayMonth (int month, int monthStartIndex, bool isBissextile, int mondayIndex)
+{
+    //Month Header
+    
+    displayCenteredText(MONTHS[month-1]);
+    
+    for (int i = 0; i < 7; ++i) {
+        cout << "  " << WEEKDAYS[(i - mondayIndex + 7) % 7];
+    }
+    cout << endl;
+    
+    //Initial Operations
+    int numDays = getDaysInMonth(month, isBissextile);
+    
+    //Display
+    
+    //Jours vides
+    for(int i=0; i<(monthStartIndex+mondayIndex)%7;++i)
+    {
+        cout<<setw(3)<<SPACE;
+;
+    }
+    //Jours pleins
+    for (int i=1; i<= numDays; ++i)
+    {
+        
+        cout<< setw(3) << i;//Jour courant
+        
+        if(not((i+mondayIndex+monthStartIndex)%7))
+        {
+            cout<<endl;
+        }
+        
+    }
+    cout << setw(DISPLAY_WIDTH - ((numDays+monthStartIndex+mondayIndex)%7)*3 + 1);
+    cout << '\n';
+        
+    return monthStartIndex = (monthStartIndex + numDays)%7;
+}
+
+void displayYear (int yearNum, int mondayIndex)
+{
+    //Initial Operations
+    bool isBissextile = checkBissextile (yearNum);
+    int monthStartIndex = yearStartIndex(yearNum);
+    
+    for (int i = 1; i<=12; ++i)
+    {
+        monthStartIndex = displayMonth (i, monthStartIndex, isBissextile, mondayIndex);
+    }
+    
+    //Display
+    
+    
+}
+
+
+int main()
+{
+    cout << setfill(SPACE);
+    displayYear (2018, 0);
+    return 0;
 }
