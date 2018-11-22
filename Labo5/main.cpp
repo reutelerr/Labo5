@@ -18,6 +18,9 @@ using namespace std;
 
 const char WEEKDAYS[7] = {'L', 'M', 'M', 'J', 'V', 'S', 'D'};
 const string MONTHS[12] = {"Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"};
+const char SPACE = '.';
+const int NUMBER_OF_YEAR_DIGITS = 4;
+const int DISPLAY_WIDTH = 21;
 
 bool checkBissextile (int yearNum)
 {
@@ -36,44 +39,78 @@ int yearStartIndex(int year)
     return (1 + 2*13 + (3*(13+1)/5) + (year-1) + ((year-1) /4) - ((year-1) /100) + ((year-1) /400))%7;
 }
 
-void displayMonth (int month, int& monthStartIndex, bool isBissextile, int mondayIndex)
+int getDaysInMonth(int month, bool isBissextile)
+{
+    int numDays = 0;
+    
+    
+    switch(month)
+    {
+        case 2:
+            numDays = 28;
+            if(isBissextile)
+            {
+                numDays+=1;
+            }
+            break;
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+            numDays = ((month+1)%2)+30;
+            break;
+        default:
+            numDays = ((month)%2)+30;
+            break;
+    }
+    
+    return numDays;
+}
+
+void displayCenteredText(string input, int lineLength = DISPLAY_WIDTH)
+{
+    cout << setw(((lineLength + (int)input.length() + 1) / 2))
+    << right << input
+    << setw((lineLength - (int)input.length())/2 + 1) <<'\n';
+}
+
+
+/*
+ @brief
+ 
+ @param int month
+ @param int monthStartIndex entier de 0 à 6
+ @param bool isBissextile indique si l'année est bissextile
+ @param int mondayIndex entier de 1 à 7
+*/
+int displayMonth (int month, int monthStartIndex, bool isBissextile, int mondayIndex)
 {
     //Month Header
-    cout<<MONTHS[month-1]<<endl;
-    for(int i=0; i<7; ++i)
-    {
-        cout<<"  "<<WEEKDAYS[(i-mondayIndex+7)%7];
+    
+    displayCenteredText(MONTHS[month-1]);
+    
+    for (int i = 0; i < 7; ++i) {
+        cout << "  " << WEEKDAYS[(i - mondayIndex + 7) % 7];
     }
-    cout<<endl;
+    cout << endl;
     
     //Initial Operations
-    int numDays = ((month+1)%2)+30;
-    if (month==2)
-    {
-        numDays -= 2;
-        if (isBissextile)
-        {
-            numDays+=1;
-        }
-    }
+    int numDays = getDaysInMonth(month, isBissextile);
     
     //Display
     
     //Jours vides
     for(int i=0; i<(monthStartIndex+mondayIndex)%7;++i)
     {
-        cout<<"   ";
+        cout<<setw(3)<<SPACE;
+;
     }
     //Jours pleins
     for (int i=1; i<= numDays; ++i)
     {
-        cout<<" ";
         
-        if(i< 10)
-        {
-            cout<<" ";//Espace en plus lorsqu'on est sur 1 digit seulement
-        }
-        cout<<i;//Jour courant
+        cout<< setw(3) << i;//Jour courant
         
         if(not((i+mondayIndex+monthStartIndex)%7))
         {
@@ -81,10 +118,10 @@ void displayMonth (int month, int& monthStartIndex, bool isBissextile, int monda
         }
         
     }
-    
-    
+    cout << setw(DISPLAY_WIDTH - ((numDays+monthStartIndex+mondayIndex)%7)*3 + 1);
+    cout << '\n';
         
-    monthStartIndex = (monthStartIndex + numDays)%7;
+    return monthStartIndex = (monthStartIndex + numDays)%7;
 }
 
 void displayYear (int yearNum, int mondayIndex)
@@ -95,7 +132,7 @@ void displayYear (int yearNum, int mondayIndex)
     
     for (int i = 1; i<=12; ++i)
     {
-        displayMonth (i, monthStartIndex, isBissextile, mondayIndex);
+        monthStartIndex = displayMonth (i, monthStartIndex, isBissextile, mondayIndex);
     }
     
     //Display
@@ -106,6 +143,7 @@ void displayYear (int yearNum, int mondayIndex)
 
 int main()
 {
-    displayYear (2018, 3);
+    cout << setfill(SPACE);
+    displayYear (2018, 0);
     return 0;
 }
