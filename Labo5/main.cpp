@@ -30,13 +30,14 @@ bool checkBissextile (int yearNum)
     }
     else
     {
-        return !(yearNum % 400);        
+        return !(yearNum % 400);
     }
 }
 
 int yearStartIndex(int year)
 {
-    return (1 + 2*13 + (3*(13+1)/5) + (year-1) + ((year-1) /4) - ((year-1) /100) + ((year-1) /400))%7;
+    year -= 1;
+    return year + year/4 - year/100 + year/400 % 7;
 }
 
 int getDaysInMonth(int month, bool isBissextile)
