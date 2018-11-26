@@ -37,7 +37,7 @@ bool checkBissextile (int yearNum)
 int yearStartIndex(int year)
 {
     year -= 1;
-    return year + year/4 - year/100 + year/400 % 7;
+    return year + year/4 - year/100 + year/400 % 7;//Décalage de 1 par année, +1 pour chaque année bissextile
 }
 
 int getDaysInMonth(int month, bool isBissextile)
@@ -85,7 +85,7 @@ void displayEmptyLine(int lineLength = DISPLAY_WIDTH)
 /*
  @brief
  
- @param int month
+ @param int month mois à afficher
  @param int monthStartIndex entier de 0 à 6
  @param bool isBissextile indique si l'année est bissextile
  @param int mondayIndex entier de 1 à 7
@@ -113,13 +113,13 @@ int displayMonth (int month, int monthStartIndex, bool isBissextile, int mondayI
 ;
     }
     //Jours pleins
-    bool EndOfLine = true;
+    bool EndOfLine = true;//Permet vérifier si l'on finit le mois le dernier jour de semaine
     for (int i=1; i<= numDays; ++i)
     {
         
         cout<< setw(3) << i;//Jour courant
         
-        if(not((i+mondayIndex+monthStartIndex)%7))
+        if(not((i+mondayIndex+monthStartIndex)%7))//Retour à la ligne en fin de semaine
         {
             cout<<endl;
             EndOfLine = true;
@@ -137,9 +137,16 @@ int displayMonth (int month, int monthStartIndex, bool isBissextile, int mondayI
     }
     
         
-    return monthStartIndex = (monthStartIndex + numDays)%7;
+    return monthStartIndex = (monthStartIndex + numDays)%7;//Ajustement du premier jour du mois
 }
 
+
+/*
+ @brief
+ 
+ @param int year année à afficher
+ @param int mondayIndex entier de 0 à 6; le décalage des jours de semaine
+ */
 void displayYear (int yearNum, int mondayIndex)
 {
     //Initial Operations
